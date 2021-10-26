@@ -36,14 +36,11 @@ class UserService extends BaseService {
             const result = await this.findOne({
                 userName: payload.userName,
             });
-            console.log(result.password);
-            console.log(payload.password);
             if (result) {
                 const validPassword = await bcrypt.compare(
                     payload.password,
                     result.password,
                 );
-                console.log(validPassword);
                 if (validPassword) {
                     return result;
                 } else {
@@ -51,6 +48,22 @@ class UserService extends BaseService {
                 }
             }
             return null;
+        } catch (e) {
+            return null;
+        }
+    }
+    async updateUser(id, item) {
+        try {
+            const result = await this.findByIdAndUpdate(id, item);
+            return result;
+        } catch (e) {
+            return null;
+        }
+    }
+    async reserPassword(filter = {}) {
+        try {
+            const result = await this.findOne(filter);
+            return result;
         } catch (e) {
             return null;
         }

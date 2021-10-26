@@ -1,8 +1,9 @@
 const UserService = require('../services/user.service');
 const BaseController = require('./baseController');
 var jwt = require('jsonwebtoken');
-var { JWT_SECRET } = require('../commons/configs/env');
+var { JWT_SECRET, BASE_URL } = require('../commons/configs/env');
 const bcrypt = require('bcrypt');
+const SendEmail = require('../validators/sendEmail');
 
 class UserController {
     constructor() {}
@@ -48,6 +49,12 @@ class UserController {
                 { _id: result._id, role: result.role },
                 JWT_SECRET,
             );
+            // var data = {
+            //     token : jwt.sign(
+            //     { _id: result._id, role: result.role },
+            //     JWT_SECRET,),
+            //     role: result.role
+            // };
             return BaseController.sendSuccess(
                 res,
                 token,
@@ -101,6 +108,101 @@ class UserController {
                 201,
                 'Get User Success!',
             );
+        } catch (e) {
+            return BaseController.sendError(res, e.message);
+        }
+    }
+    //[POST] /api/user/
+    async updateUser(req, res) {
+        try {
+            const user = await UserService.updateUser(
+                req.value.body.decodeToken._id,
+                req.body,
+            );
+            if (user === null) {
+                return BaseController.sendSuccess(
+                    res,
+                    null,
+                    300,
+                    'Update  Failed!',
+                );
+            }
+            return BaseController.sendSuccess(
+                res,
+                user,
+                201,
+                'Update Success!',
+            );
+        } catch (e) {
+            return BaseController.sendError(res, e.message);
+        }
+    }
+    //[POST] /api/user/forgotPassword
+    async resetPassword(req, res) {
+        try {
+            const user = await UserService.reserPassword({
+                email: req.body.email,
+            });
+            const password =
+                Math.floor(Math.random() * (99999999 - 100000)) + 100000;
+            var salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password.toString(), salt);
+            user.save();
+            if (user) {
+                var token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+                    expiresIn: '5m',
+                });
+                return SendEmail(
+                    user.email,
+                    'Quên mật khẩu!',
+                    `Mật khẩu mới của bạn là ${password}`,
+                    res,
+                );
+            }
+            return BaseController.sendSuccess(res, null, 404, 'NOT FOUND');
+        } catch (e) {
+            return BaseController.sendError(res, e.message);
+        }
+    }
+    //[POST]
+    async changePassword(req, res) {
+        try {
+            console.log(req.value.body.decodeToken._id);
+            const user = await UserService.getUser(
+                req.value.body.decodeToken._id,
+            );
+            if (user === null) {
+                return BaseController.sendSuccess(
+                    res,
+                    null,
+                    300,
+                    'Not Permitted!',
+                );
+            }
+            console.log(req.body.oldPassword);
+            const validPassword = await bcrypt.compare(
+                req.body.oldPassword,
+                user.password,
+            );
+            console.log(validPassword);
+            if (validPassword) {
+                var salt = await bcrypt.genSalt(10);
+                user.password = await bcrypt.hash(req.body.newPassword, salt);
+                user.save();
+                return BaseController.sendSuccess(
+                    res,
+                    user,
+                    201,
+                    'Change Password Success!',
+                );
+            } else {
+                return BaseController.sendSuccess(
+                    res,
+                    null,
+                    300,
+                    'Change Password Fail!',
+                );
+            }
         } catch (e) {
             return BaseController.sendError(res, e.message);
         }
