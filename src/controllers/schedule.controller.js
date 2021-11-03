@@ -108,14 +108,60 @@ class ScheduleController {
                         res,
                         null,
                         300,
-                        'Get All Failed!',
+                        'Get Schedule Failed!',
                     );
                 }
                 return BaseController.sendSuccess(
                     res,
                     schedule,
                     201,
-                    'Get All Success!',
+                    'Get Schedule Success!',
+                );
+            });
+        } catch (e) {
+            return BaseController.sendError(res, e.message);
+        }
+    }
+    //[GET] /api/schedule/count
+    async CountUserSchedule(req, res) {
+        try {
+            ScheduleService.CountSchedule().then((result) => {
+                if (result === null) {
+                    return BaseController.sendSuccess(
+                        res,
+                        null,
+                        300,
+                        'Get Schedule Failed!',
+                    );
+                }
+                return BaseController.sendSuccess(
+                    res,
+                    result,
+                    200,
+                    'Get Schedule Success!',
+                );
+            });
+        } catch (e) {
+            return BaseController.sendError(res, e.message);
+        }
+    }
+    //[GET] /api/schedule/countMount
+    async CountMountSchedule(req, res) {
+        try {
+            ScheduleService.CountMonth({ month: '' }).then((result) => {
+                if (result === null) {
+                    return BaseController.sendSuccess(
+                        res,
+                        null,
+                        300,
+                        'Get Schedule Failed!',
+                    );
+                }
+                return BaseController.sendSuccess(
+                    res,
+                    result,
+                    200,
+                    'Get Schedule Success!',
                 );
             });
         } catch (e) {
