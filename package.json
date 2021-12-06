@@ -4,14 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon src/server.js",
+    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
-    "add": "^2.0.6",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -26,15 +24,14 @@
     "mongoose": "^6.0.8",
     "multer": "^1.4.3",
     "nodemailer": "^6.7.0",
-    "uuid-v4": "^0.1.0"
-  },
-  "devDependencies": {
+    "uuid-v4": "^0.1.0",
     "husky": "^7.0.2",
     "lint-staged": "^11.1.2",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.13",
     "prettier": "^2.4.1"
   },
+  "devDependencies": {},
   "lint-staged": {
     "*.{js,css,md}": "prettier --single-quote --trailing-comma all --tab-width 4 --write"
   }
